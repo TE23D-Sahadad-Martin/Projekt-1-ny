@@ -1,133 +1,102 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
-
 public class App {
-
     public static void main(String[] args) {
-        Scanner input = new Scanner(System.in);
 
-        ArrayList<Beställning> beställningar = new ArrayList<>();
+        Scanner sc = new Scanner(System.in);
+        ArrayList<Hus> beställningar = new ArrayList<>();
 
-        boolean kör = true;
-
-        while (kör) {
-            System.out.println("\n==== BYGGFÖRETAGET ====");
-            System.out.println("1. Lägg till beställning");
-            System.out.println("2. Lista beställningar");
-            System.out.println("3. Ta bort en beställning");
-            System.out.println("4. Visa total vinst");
-            System.out.println("5. Avsluta");
+        while (true) {
+            System.out.println("\n--- BYGGFÖRETAGET ---");
+            System.out.println("1. Lägg till beställning"); //lägger till beställning 
+            System.out.println("2. Lista alla beställningar"); //visar alla beställningar du har gjort
+            System.out.println("3. Visa total vinst");
+            System.out.println("4. Avsluta");
             System.out.print("Välj: ");
 
-            int val = input.nextInt();
+            int val = sc.nextInt();
+            sc.nextLine(); 
 
-            switch (val) {
-                case 1 -> {
-                    System.out.println("Välj typ:");
-                    System.out.println("1. Villa");
-                    System.out.println("2. Radhus");
-                    System.out.println("3. Garage");
+            if (val == 1) {
+                System.out.println("\nVilken typ av byggnad?");
+                System.out.println("1. Villa");
+                System.out.println("2. Radhus");
+                System.out.println("3. Parhus");
+                System.out.print("Välj: ");
+                int typ = sc.nextInt();
+                sc.nextLine();
 
-                    int typVal = input.nextInt();
+                // Frågar efter information av huset
+                System.out.print("Antal rum: ");
+                int rum = sc.nextInt();
+                System.out.print("Yta (kvm): ");
+                int yta = sc.nextInt();
+                System.out.print("Antal badrum: ");
+                int badrum = sc.nextInt();
+                System.out.print("Kök (1 = ja, 0 = nej): ");
+                int kök = sc.nextInt();
 
-                    Beställning ny = null;
+                int tomt = 0; 
 
-                    if (typVal == 1) {
-                        ny = new Villa();
-                    } else if (typVal == 2) {
-                        ny = new Radhus();
-                    } else if (typVal == 3) {
-                        ny = new Garage();
-                    }
-
-                    if (ny != null) {
-                        beställningar.add(ny);
-                        System.out.println("Beställningen lades till!");
-                    }
+                if (typ == 1 || typ == 2) {
+                    System.out.print("Tomtstorlek (kvm): ");
+                    tomt = sc.nextInt();
                 }
 
-                case 2 -> {
-                    System.out.println("\n--- Alla beställningar ---");
+                System.out.print("Pris (kr): ");
+                int pris = sc.nextInt();
 
-                    if (beställningar.isEmpty()) {
-                        System.out.println("Inga beställningar finns ännu.");
-                    } else {
-                        for (Beställning b : beställningar) {
-                            System.out.println(b);
-                        }
-                    }
+                
+                Hus h = new Hus(rum, yta, badrum, kök, tomt, pris);
+                beställningar.add(h);
+
+                System.out.println("Beställning tillagd!");
+
+            } else if (val == 2) {
+                System.out.println("\n--- ALLA BESTÄLLNINGAR ---");
+                for (Hus h : beställningar) {
+                    System.out.println(h);
                 }
 
-                case 3 -> {
-                    System.out.println("Vilken beställning vill du ta bort? (Index börjar vid 0)");
-
-                    int index = input.nextInt();
-
-                    if (index >= 0 && index < beställningar.size()) {
-                        beställningar.remove(index);
-                        System.out.println("Beställning borttagen!");
-                    } else {
-                        System.out.println("Ogiltigt index.");
-                    }
+            } else if (val == 3) {
+                int total = 0;
+                for (Hus h : beställningar) {
+                    total += h.pris;
                 }
+                System.out.println("Total vinst: " + total + " kr");
 
-                case 4 -> {
-                    int total = 0;
-                    for (Beställning b : beställningar) {
-                        total += b.getPris();
-                    }
-                    System.out.println("Total vinst: " + total + " kr");
-                }
-
-                case 5 -> {
-                    kör = false;
-                    System.out.println("Programmet avslutas...");
-                }
-
-                default -> System.out.println("Fel val.");
+            } else if (val == 4) {
+                System.out.println("Program avslutas.");
+                break;
             }
         }
     }
 }
 
+class Hus {
+    int rum;
+    int yta;
+    int badrum;
+    int kök;
+    int tomtstorlek;
+    int pris;
 
-abstract class Beställning {
-    protected int pris;
-
-    public int getPris() {
-        return pris;
+    Hus(int rum, int yta, int badrum, int kök, int tomtstorlek, int pris) {
+        this.rum = rum;
+        this.yta = yta;
+        this.badrum = badrum;
+        this.kök = kök;
+        this.tomtstorlek = tomtstorlek;
+        this.pris = pris;
     }
 
-    @Override
     public String toString() {
-        return "Typ: " + this.getClass().getSimpleName() + " | Pris: " + pris + " kr";
-    }
-}
-
-
-class Villa extends Beställning {
-
-    public Villa() {
-    
-        this.pris = 3500000 + (int)(Math.random() * 1500000);
-    }
-}
-
-
-class Radhus extends Beställning {
-
-    public Radhus() {
-     
-        this.pris = 2500000 + (int)(Math.random() * 1500000);
-    }
-}
-
-
-class Garage extends Beställning {
-
-    public Garage() {
-     
-        this.pris = 500000 + (int)(Math.random() * 500000);
+        return "Rum: " + rum +
+                ", Yta: " + yta + " kvm" +
+                ", Badrum: " + badrum +
+                ", Kök: " + (kök == 1 ? "Ja" : "Nej") +
+                ", Tomt: " + tomtstorlek + " kvm" +
+                ", Pris: " + pris + " kr";
     }
 }
